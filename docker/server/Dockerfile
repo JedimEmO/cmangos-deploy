@@ -125,7 +125,8 @@ RUN \
   rm -rf /var/lib/apt/lists/*
 
 # The configuration files come from a bind mount. `include/`, `lib/`, and
-# `share/` can hold libraries CMaNGOS bundles, which the image does not need.
+# `share/` can contain libraries CMaNGOS bundles, which the image does not
+# need.
 COPY \
   --from=build \
   --exclude=cmangos/etc* \

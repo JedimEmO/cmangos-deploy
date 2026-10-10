@@ -44,7 +44,7 @@ mark_initialized() {
 }
 
 # A data directory from before the markers counts as set up when its world
-# database holds data.
+# database contains data.
 require_initialized() {
   if [[ -f "$INITIALIZED_MARKER" ]]; then
     return 0
@@ -58,7 +58,7 @@ require_initialized() {
     return 0
   fi
 
-  cmangos_fail "The databases are not set up completely. If this is a new installation, remove the database volume and start again. Otherwise the volume holds your characters: remove it only if you have a backup, and restore the backup after the new start:
+  cmangos_fail "The databases are not set up completely. If this is a new installation, remove the database volume and start again. Otherwise the volume contains your characters: remove it only if you have a backup, and restore the backup after the new start:
 https://github.com/mserajnik/cmangos-deploy/blob/master/docs/usage.md#restoring-a-backup"
 }
 
