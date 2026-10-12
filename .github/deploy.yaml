@@ -77,7 +77,7 @@ drift:
     # change here likely means upstream fixed it, and the workaround can be
     # removed.
     - {source: db, variants: [tbc], files: [locales/OtherLocales.sql]}
-    # Playerbots has one configuration template per expansion.
+    # The Playerbot module has one configuration template per expansion.
     - {source: playerbots, files: [playerbot/aiplayerbot.conf.dist.in, playerbot/aiplayerbot.conf.dist.in.tbc, playerbot/aiplayerbot.conf.dist.in.wotlk]}
     # `docker/database/docker-entrypoint.sh` builds on this entrypoint.
     - {source: mariadb, files: [12.3/docker-entrypoint.sh]}

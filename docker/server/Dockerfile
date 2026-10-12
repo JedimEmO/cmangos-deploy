@@ -85,8 +85,8 @@ RUN \
     -DBUILD_AHBOT=ON \
     -DBUILD_EXTRACTORS=ON \
     -DBUILD_PLAYERBOTS=ON \
-    # Without this, `FetchContent` checks out Playerbots' `master`, which drops
-    # the pin and the patches.
+    # Without this, `FetchContent` checks out the `master` branch of the
+    # Playerbot module, which drops the pin and the patches.
     -DFETCHCONTENT_SOURCE_DIR_PLAYERBOTS=/build/core/src/modules/PlayerBots && \
   cmake --build . -j"$(nproc)" && \
   cmake --install . && \

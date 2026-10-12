@@ -33,10 +33,9 @@ offers:
   your databases up to date at all times.
 
 > [!NOTE]
-> The Docker images are built daily when CMaNGOS or Playerbot has had new
-> commits since the last build. Additionally, every Monday, the latest images
-> are rebuilt to keep their system packages up to date, even if neither CMaNGOS
-> nor Playerbot has changed.
+> The Docker images are built daily when CMaNGOS has had new commits since the
+> last build. Additionally, every Monday, the latest images are rebuilt to keep
+> their system packages up to date, even if CMaNGOS has not changed.
 
 ## Quick start
 

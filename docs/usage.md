@@ -28,7 +28,7 @@ directory under [`config/`](../config), and its own storage directory under
 ### Pinning a specific CMaNGOS build
 
 Each image has a tag that names the three commits of its build, the core, the
-database, and Playerbot, as 7-character prefixes, such as
+database, and the Playerbot module, as 7-character prefixes, such as
 `classic-core.8ec338a-db.ec4f596-playerbots.1bafc21`. Use such tags to pin your
 installation to a specific build. You have to give the server and the database
 image the same tag, so the code and the data match. The databases apply new
