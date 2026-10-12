@@ -1,0 +1,19 @@
+diff --git a/playerbot/PlayerbotAI.cpp b/playerbot/PlayerbotAI.cpp
+index f5cba54..af8eca7 100644
+--- a/playerbot/PlayerbotAI.cpp
++++ b/playerbot/PlayerbotAI.cpp
+@@ -205,8 +205,12 @@ PlayerbotAI::PlayerbotAI(Player* bot) :
+     botOutgoingPacketHandlers.AddHandler(SMSG_BATTLEFIELD_STATUS, "bg status");
+     botOutgoingPacketHandlers.AddHandler(SMSG_GROUP_INVITE, "group invite");
+     botOutgoingPacketHandlers.AddHandler(SMSG_GUILD_INVITE, "guild accept");
+-    botOutgoingPacketHandlers.AddHandler(BUY_ERR_NOT_ENOUGHT_MONEY, "not enough money");
+-    botOutgoingPacketHandlers.AddHandler(BUY_ERR_REPUTATION_REQUIRE, "not enough reputation");
++    // cmangos-deploy: cmangos/mangos-wotlk turned `BuyResult` into an enum
++    // class and renamed `BUY_ERR_NOT_ENOUGHT_MONEY` and
++    // `BUY_ERR_REPUTATION_REQUIRE`, which has not been incorporated into
++    // cmangos/playerbots yet.
++    botOutgoingPacketHandlers.AddHandler((uint16)BuyResult::NOT_ENOUGHT_MONEY, "not enough money");
++    botOutgoingPacketHandlers.AddHandler((uint16)BuyResult::REPUTATION_REQUIRE, "not enough reputation");
+     botOutgoingPacketHandlers.AddHandler(SMSG_GROUP_SET_LEADER, "group set leader");
+     botOutgoingPacketHandlers.AddHandler(SMSG_FORCE_RUN_SPEED_CHANGE, "check mount state");
+     // shouldDelay=true: ExternalEventHelper::HandlePacket() returns false when the 'resurrect request'
