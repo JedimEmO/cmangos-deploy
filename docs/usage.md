@@ -276,8 +276,48 @@ The container waits as long as you need. To resolve the halt:
    docker compose exec database cmangos-confirm-changes
    ```
 
-The start then records the commits as applied and continues. To give up on the
-start, run `docker compose down`.
+The `database` service then records the commits as applied, and the start
+continues.
+
+If you would rather cancel the start and handle the edits later, run
+`docker compose down` instead of confirming. The `database` service halts again
+on your next start.
+
+In a database with player data, you can ignore an edit to a migration that has
+not been applied to it yet. How to check depends on where the migration comes
+from:
+
+- A CMaNGOS update, such as
+  `z2819_01_characters_item_instance_text_id_fix.sql`: the database records
+  only the last update it applied, as the column name of its version table
+  (`character_db_version`, `realmd_db_version`, or `logs_db_version`):
+
+  ```sh
+  docker compose exec database mariadb -u root -p <database> \
+    -e "SELECT * FROM <version-table>"
+  ```
+
+  An update whose number, such as `z2819_01`, is higher than the number in that
+  column name has not been applied.
+- A file of the Playerbot module in `sql/characters/`: the database records
+  each applied file by its name, with `.sql`:
+
+  ```sh
+  docker compose exec database mariadb -u root -p <database> \
+    -e "SELECT sql_key FROM cmangos_deploy_applied_sql \
+      WHERE sql_key = 'playerbots-characters/<file-name>'"
+  ```
+
+  When the query returns no row, the file has not been applied.
+- A change to a base dump, `sql/base/<database>.sql`: the database read this
+  file only when it was created. If the same commit adds an update that has not
+  been applied yet, that update makes the same change, so you can ignore the
+  edit. Otherwise, apply it by hand.
+
+For a renamed migration, check its old file name.
+
+Even when every listed edit can be ignored, you still have to confirm, as step
+3 above describes.
 
 > [!WARNING]
 > The confirmation marks the listed commits as applied without checking your
