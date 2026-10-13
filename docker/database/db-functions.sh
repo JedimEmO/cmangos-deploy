@@ -518,7 +518,7 @@ fix_tbc_locales_gameobject() {
     return 0
   fi
 
-  cmangos_log "Re-applying the s2485 changes to 'locales_gameobject' on '$world_db' (upstream tbc-db bug workaround)..."
+  cmangos_log "Re-applying the s2485 changes to 'locales_gameobject' on '$world_db' (workaround for a bug in 'cmangos/tbc-db')..."
   mariadb -u root -p"$MARIADB_ROOT_PASSWORD" "$world_db" <<'SQL'
 ALTER TABLE `locales_gameobject` CHANGE `name_loc1` `name_loc1` varchar(100);
 ALTER TABLE `locales_gameobject` CHANGE `name_loc2` `name_loc2` varchar(100);

@@ -27,7 +27,7 @@ directory under [`config/`](../config), and its own storage directory under
 
 ### Pinning a specific CMaNGOS build
 
-Each image has a tag that names the three commits of its build, the core, the
+Each image has a tag with the three commits of its build, the core, the
 database, and the Playerbot module, as 7-character prefixes, such as
 `classic-core.8ec338a-db.ec4f596-playerbots.1bafc21`. Use such tags to pin your
 installation to a specific build. You have to give the server and the database
@@ -189,7 +189,7 @@ docker compose run --rm check-deploy-version
 ```
 
 When the new images need configuration adjustments due to a
-[breaking change](breaking-changes.md), the check fails and names the version
+[breaking change](breaking-changes.md), the check fails and shows the version
 they expect. Make those adjustments first. The `check-deploy-version` service
 reads only `CMANGOS_DEPLOY_VERSION` of `mangosd`. The `database`, `realmd`, and
 `mangosd` services also each check their own value when they start, so you have
