@@ -10,7 +10,7 @@ AiPlayerbot.Enabled = 1
 
 # cmangos-deploy disables the random bot system by default to avoid
 # auto-spawning hundreds of bots. `AiPlayerbot.Enabled` above stays on so
-# players can still spawn bots on demand (e.g. via the `.bot` command).
+# players can still spawn bots on demand (for example with the `.bot` command).
 # Enable random bot system
 AiPlayerbot.RandomBotAutologin = 0
 

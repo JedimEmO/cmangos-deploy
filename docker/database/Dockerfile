@@ -62,9 +62,9 @@ RUN \
         */playerbots/*) target=/build/playerbots ;; \
         *) target=/build/core ;; \
       esac; \
-      echo "Applying patch '$patch' to '$target'."; \
+      echo "Applying the patch '$patch' to '$target'..."; \
       if ! ( cd "$target" && git apply "$patch" ); then \
-        echo "Failed to apply patch '$patch'."; \
+        echo "Failed to apply the patch '$patch' to '$target'."; \
         if [ "$CMANGOS_FAIL_ON_PATCH_ERROR" = "1" ]; then \
           exit 1; \
         fi; \
@@ -73,7 +73,7 @@ RUN \
     fi; \
   done && \
   if [ "$patch_count" -eq 0 ]; then \
-    echo "No patches found."; \
+    echo "Found no patches to apply."; \
   fi && \
   mkdir -p /sql/core /sql/custom /sql/database /sql/playerbots && \
   cp -a /build/core/sql/base /sql/core/base && \

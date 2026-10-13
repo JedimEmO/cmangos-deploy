@@ -15,7 +15,7 @@ ConfVersion=2021011201
 # Values must be in range 0-100. Default values are Sell(10) and Buy(10).
 ###################################################################################################################
 # cmangos-deploy disables AHBot by default by setting both chances to 0.
-# Raise either above 0 to re-enable (the upstream defaults are 10).
+# Raise either above 0 to re-enable it (the CMaNGOS defaults are 10).
 AuctionHouseBot.Chance.Sell = 0
 AuctionHouseBot.Chance.Buy  = 0
 

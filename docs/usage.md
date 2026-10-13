@@ -3,7 +3,7 @@
 To run CMaNGOS, you choose Docker images for an expansion, extract the client
 data, and start the server with Docker Compose. Later, you update it to get the
 latest CMaNGOS changes. The sections below describe each step, and other tasks
-such as creating accounts, making backups, and accessing the database. The
+such as creating accounts, making backups, and accessing the databases. The
 [Docker Compose reference](compose.md) describes each setting in your
 `compose.yaml`. Every example uses Classic; for another expansion, replace
 `classic` with `tbc` or `wotlk`.
@@ -13,7 +13,8 @@ such as creating accounts, making backups, and accessing the database. The
 ### Expansions
 
 cmangos-deploy builds a server image and a database image for each expansion
-that CMaNGOS supports, each from the tip of that expansion's `master` branches:
+that CMaNGOS supports, from the tips of the `master` branches of the
+expansion's core and world database and of the Playerbot module:
 
 | Expansion          | Server image                               | Database image                               |
 | ------------------ | ------------------------------------------ | -------------------------------------------- |
@@ -27,13 +28,14 @@ directory under [`config/`](../config), and its own storage directory under
 
 ### Pinning a specific CMaNGOS build
 
-Each image has a tag with the three commits of its build, the core, the
-database, and the Playerbot module, as 7-character prefixes, such as
+Each image has a tag with the three commits of its build, one each from the
+repositories of the core, the world database, and the Playerbot module, as
+7-character prefixes, such as
 `classic-core.8ec338a-db.ec4f596-playerbots.1bafc21`. Use such tags to pin your
 installation to a specific build. You have to give the server and the database
-image the same tag, so the code and the data match. The databases apply new
-migrations on start, so an image older than the ones you ran before cannot work
-with them.
+image the same tag, so the code and the data match. The `database` service
+applies new migrations on startup, so an image older than the ones you ran
+before cannot work with the databases.
 
 Since the Docker images are generally built only once a day, there is likely no
 build for every single CMaNGOS commit combination. Older images are deleted
@@ -191,9 +193,9 @@ docker compose run --rm check-deploy-version
 When the new images need configuration adjustments due to a
 [breaking change](breaking-changes.md), the check fails and shows the version
 they expect. Make those adjustments first. The `check-deploy-version` service
-reads only `CMANGOS_DEPLOY_VERSION` of `mangosd`. The `database`, `realmd`, and
-`mangosd` services also each check their own value when they start, so you have
-to set the same number in all three.
+reads only `CMANGOS_DEPLOY_VERSION` of the `mangosd` service. The `database`,
+`realmd`, and `mangosd` services also each check their own value when they
+start, so you have to set the same number in all three.
 
 If the check passes and prints that the variable matches, re-create the
 containers:
@@ -206,19 +208,21 @@ If you pinned your installation to a specific build, the update only takes
 effect once you set newer tags.
 
 On the first start after an update, the `database` service applies the new
-migrations to the databases. If a migration fails, the `database` service logs
-the error, and its automatic restart counts the migration as applied. The cause
-is a bug or something in your installation. Check the log for what failed, and
-decide for yourself how to continue. You likely have to restore a backup from
-before the update: remove the database volume with `docker compose down -v`,
-start again, and restore the backup as the
-[restoring a backup section](#restoring-a-backup) shows.
+migrations. If a migration fails, the `database` service logs the error and
+stops. Depending on the migration, its automatic restart either counts it as
+applied or runs it again and fails the same way. The cause is a bug or
+something in your installation. Check the log for what failed, and decide for
+yourself how to continue. You likely have to restore a backup from before the
+update: remove the database volume with `docker compose down -v`, start again,
+and restore the backup as the [restoring a backup section](#restoring-a-backup)
+shows.
 
 ### Updating your clone
 
 Update your clone of this repository regularly with `git pull`, and always
 before you apply a breaking change, so you have the updated example Compose
-files to compare with.
+files to compare with. Most other changes are maintenance or new CMaNGOS
+options that you may want in your configuration.
 
 > [!IMPORTANT]
 > The relaunch replaced the history of this repository, so `git pull` fails in
@@ -228,22 +232,20 @@ files to compare with.
 > any edit you made to the repository's own files. Afterwards, `git pull` works
 > again.
 
-Most other changes are maintenance or new CMaNGOS options that you may want in
-your configuration.
-
 ## Migration edits
 
-Sometimes, the developers of CMaNGOS or the Playerbot module edit a migration
-that your databases have already applied. The database cannot apply such a
-change again, so cmangos-deploy detects these edits and acts on them.
+Sometimes, the CMaNGOS developers edit a migration that has already been
+applied to one of your databases. The `database` service does not apply an
+edited migration again, so cmangos-deploy detects these edits and acts on them.
 
 - For the world database, the `database` service re-creates it from the new
   image. Changes you made directly in the world database are lost, such as your
   own NPCs or `npc_vendor` edits. Keep such changes as
-  [custom SQL](#custom-sql), which the database runs again after the
+  [custom SQL](#custom-sql), which the `database` service runs again after the
   re-creation.
-- A database with player data cannot be re-created. For those, the start halts
-  and asks you to apply the change by hand, as the next section describes.
+- A database with player data cannot be re-created. For such a database, the
+  start halts and asks you to apply the change by hand, as the next section
+  describes.
 
 The [`database` section](compose.md#database) of the Docker Compose reference
 describes the two variables that control this.
@@ -251,23 +253,23 @@ describes the two variables that control this.
 ### Applying changes by hand
 
 When the start halts, the `database` service prints the affected databases and
-the link to the commit of each edit. `realmd` and `mangosd` wait for the
-database, so `docker compose up -d` keeps waiting too. Read the message from a
-second terminal:
+the link to the commit of each edit. The `realmd` and `mangosd` services wait
+for the `database` service, so `docker compose up -d` keeps waiting too. Read
+the message from a second terminal:
 
 ```sh
 docker compose logs database
 ```
 
-The container waits as long as you need. To resolve the halt:
+The `database` service waits as long as you need. To resolve the halt:
 
 1. Open each linked commit and read its changes to the SQL files.
 2. Make each edit's changes yourself in the affected database, whose name the
-   message lists with the edit. The database does not apply an edited migration
-   again, so it still matches the result of the old version. Compare the old
-   and the new version of each edited file in the commit, and run the SQL that
-   changes the database to the result of the new version. For example, if the
-   edit adds a column, add that column yourself.
+   message lists with the edit. The `database` service does not apply an edited
+   migration again, so the database still matches the result of the old
+   version. Compare the old and the new version of each edited file in the
+   commit, and run the SQL that changes the database to the result of the new
+   version. For example, if the edit adds a column, add that column yourself.
 
    To open a database, run:
 
@@ -289,7 +291,7 @@ continues.
 
 > [!WARNING]
 > The confirmation marks the listed commits as applied without checking your
-> database. If your change is wrong or incomplete, the database stays
+> databases. If your change is wrong or incomplete, the affected database stays
 > inconsistent, and CMaNGOS may fail to start. Matching what the commits do is
 > your responsibility, and cmangos-deploy provides no further support for
 > individual cases.
@@ -302,21 +304,22 @@ In a database with player data, you can ignore an edit to a migration that has
 not been applied to it yet. How to check depends on where the migration comes
 from:
 
-- A CMaNGOS update, such as
+- A versioned update in `sql/updates/<database>/`, such as
   `z2819_01_characters_item_instance_text_id_fix.sql`: the database records
-  only the last update it applied, as the column name of its version table
-  (`character_db_version`, `realmd_db_version`, or `logs_db_version`):
+  only the last versioned update applied to it, as the column name of its
+  version table (`character_db_version`, `realmd_db_version`, or
+  `logs_db_version`):
 
   ```sh
   docker compose exec database mariadb -u root -p <database> \
     -e "SELECT * FROM <version-table>"
   ```
 
-  The column name contains the number of the last applied update, such as
-  `z2818_02` in `required_z2818_02_characters_...`. An update with a higher
-  number has not been applied: compare the part before the underscore first,
-  such as `2819` against `2818`, and the part after it only when those are
-  equal.
+  The column name contains the number of the last applied versioned update,
+  such as `z2818_02` in `required_z2818_02_characters_...`. A versioned update
+  with a higher number has not been applied: compare the part before the
+  underscore first, such as `2819` against `2818`, and the part after it only
+  when those are equal.
 - A file of the Playerbot module in `sql/characters/`: the database records
   each applied file by its name, with `.sql`:
 
@@ -329,9 +332,9 @@ from:
   When the query returns no row, the file has not been applied.
 - A change to a base dump, `sql/base/<database>.sql`: the `database` service
   imported this file only when it created the database. If the same commit adds
-  an update that has not been applied yet, that update usually makes the same
-  change. Compare the two, and if the update covers every change to the base
-  dump, you can ignore the edit. Otherwise, apply the rest by hand.
+  a versioned update that has not been applied yet, that update usually makes
+  the same change. Compare the two, and if the update covers every change to
+  the base dump, you can ignore the edit. Otherwise, apply the rest by hand.
 
 For a renamed migration, check its old file name.
 
@@ -354,12 +357,12 @@ uncomment it (see the
 [`database-backup` section](compose.md#database-backup-optional)).
 
 > [!NOTE]
-> The Compose file leaves the world and logs databases out of the
+> The example Compose file leaves the world and logs databases out of the
 > `database-backup` service, because most personal installations likely do not
 > care enough about their contents to accept much larger backups. Apart from
-> changes you make to it yourself, the image can re-create the world database.
-> The logs database stores what the servers log to it. To back up either, add
-> `mangos` or `logs` to `DB_DUMP_INCLUDE`.
+> changes you make to it yourself, the `database` service can re-create the
+> world database. The logs database stores what the servers log to it. To back
+> up either, add `mangos` or `logs` to `DB_DUMP_INCLUDE`.
 
 To create a backup right away, run:
 
@@ -390,15 +393,15 @@ restore one:
      <backup-file>
    ```
 
-3. Restart the database, which applies the migrations the backup lacks and
-   writes the realm entry again, then start the servers:
+3. Restart the `database` service, which applies the migrations the backup
+   lacks and writes the realm entry again, then start the servers:
 
    ```sh
    docker compose restart database
    docker compose start realmd mangosd
    ```
 
-   If the backup is older than a migration edit, the restart handles the edit
+   If the backup is older than a migration edit, the restart acts on the edit
    again, as the [migration edits section](#migration-edits) describes.
 
 ## Database access
@@ -410,9 +413,9 @@ the browser once you uncomment it (see the
 
 ### Database security
 
-Do not expose the database to the internet, whether through a port mapping, a
-phpMyAdmin instance, or anything else. If you expose it anyway, you are
-responsible for securing it. cmangos-deploy does not support such a setup.
+Do not expose the databases to the internet, whether through a port mapping, a
+phpMyAdmin instance, or anything else. If you expose them anyway, you are
+responsible for securing them. cmangos-deploy does not support such a setup.
 
 > [!CAUTION]
 > The `root` user and the user from `MARIADB_USER` have full access to all

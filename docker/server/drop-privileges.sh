@@ -23,6 +23,6 @@ if [ "$(id -u)" = "0" ]; then
   export HOME=/home/cmangos CMANGOS_PRIVILEGES_DROPPED=1
   exec setpriv --reuid="$uid" --regid="$gid" --clear-groups --inh-caps=-all "$0" "$@"
 elif [ -z "${CMANGOS_PRIVILEGES_DROPPED:-}" ]; then
-  echo "[cmangos-deploy]: ERROR: The container has to start as root. Replace 'user' with 'CMANGOS_UID' and 'CMANGOS_GID' in its service in your 'compose.yaml', as the 'compose-*.yaml.example' files show." >&2
+  echo "[cmangos-deploy]: ERROR: The container has to start as root. Replace 'user' with 'CMANGOS_UID' and 'CMANGOS_GID' in its service in your 'compose.yaml', as the example Compose file shows." >&2
   exit 1
 fi

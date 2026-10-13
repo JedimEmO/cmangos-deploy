@@ -35,7 +35,7 @@ offers:
 > [!NOTE]
 > The Docker images are built daily when CMaNGOS has had new commits since the
 > last build. Additionally, every Monday, the latest images are rebuilt to keep
-> their system packages up to date, even if CMaNGOS has not changed.
+> their system packages up to date, even if CMaNGOS itself has not changed.
 
 ## Quick start
 
@@ -170,9 +170,10 @@ The prompt that works best depends on the agent and the model.
 ## Documentation
 
 - [Usage](docs/usage.md): choosing images, the client data, running and
-  updating CMaNGOS, Playerbot and AHBot, backups, and database access.
-- [Docker Compose reference](docs/compose.md): every setting in the Compose
-  files.
+  updating CMaNGOS, the Playerbot and AHBot settings, backups, and database
+  access.
+- [Docker Compose reference](docs/compose.md): every setting in your
+  `compose.yaml`.
 - [Breaking changes](docs/breaking-changes.md): the changes you have to act on
   when you update.
 

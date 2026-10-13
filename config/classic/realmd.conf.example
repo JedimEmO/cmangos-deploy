@@ -1,13 +1,13 @@
-# cmangos-deploy: this file differs from upstream's `realmd.conf.dist.in` in
-# the options below, which it leaves out, because the image sets them and
+# cmangos-deploy: this file differs from the `realmd.conf.dist.in` of CMaNGOS
+# in the options below, which it leaves out, because the image sets them and
 # ignores them in this file. Adding one back has no effect, and neither has an
 # environment variable for one.
 #
 # - `LoginDatabaseInfo`: the server connects to the `database` service, with
 #   the user and password from `CMANGOS_DATABASE_USER` and
-#   `CMANGOS_DATABASE_PASSWORD` in the Compose file.
-# - `LogsDir`: the directory under `/opt/cmangos/storage/` that the Compose
-#   file mounts.
+#   `CMANGOS_DATABASE_PASSWORD` in your `compose.yaml`.
+# - `LogsDir`: the directory under `/opt/cmangos/storage/` that your
+#   `compose.yaml` mounts.
 # - `RealmServerPort` and `BindIP`: to use another port, change its host side
 #   in your `compose.yaml`.
 

@@ -1,7 +1,7 @@
-# cmangos-deploy: this file differs from upstream's `anticheat.conf.dist.in`
-# in `Warden.ModuleDir`, which it leaves out, because the image sets it to the
-# Warden modules it contains and ignores it in this file. Adding it back has
-# no effect, and neither has an environment variable for it.
+# cmangos-deploy: this file differs from the `anticheat.conf.dist.in` of
+# CMaNGOS in `Warden.ModuleDir`, which it leaves out, because the image sets it
+# to the Warden modules it contains and ignores it in this file. Adding it back
+# has no effect, and neither has an environment variable for it.
 
 # NOTE:
 #

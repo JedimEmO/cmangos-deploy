@@ -4,8 +4,9 @@ Some updates require you to adjust your configuration. These breaking changes
 are listed below, newest first.
 
 Every Docker image checks `CMANGOS_DEPLOY_VERSION` on startup. Each breaking
-change raises the number it expects by 1, and thus prevents installations that
-lack the necessary adjustments for the breaking change from starting.
+change raises the number that the images expect by one, and thus prevents
+installations that lack the necessary adjustments for the breaking change from
+starting.
 
 To update across a version, first refresh your clone of this repository, as the
 [updating your clone section](usage.md#updating-your-clone) describes, so you
@@ -25,21 +26,21 @@ the repository's own files. Otherwise, make a new clone of the repository and
 move these over without replacing the repository's own files. Either way,
 `git pull` works again afterwards.
 
-Version 1 makes many changes to the Compose file, which would be cumbersome to
-make by hand. Instead, it is recommended to start from a fresh copy of the
-example Compose file for your chosen expansion, and then re-apply your
-customizations there. Before you replace your `compose.yaml` with the fresh
-copy, note down the changes you made in it. The database passwords in
-particular have to stay the same, because an existing database keeps the
-passwords it was created with.
+Version 1 changes the example Compose file in many places, which would be
+cumbersome to repeat by hand. Instead, it is recommended to start from a fresh
+copy of the example Compose file for your chosen expansion, and then re-apply
+your customizations there. Before you replace your `compose.yaml` with the
+fresh copy, note down the changes you made in it. The database passwords in
+particular have to stay the same, because MariaDB sets them only on the first
+start, as the [database users section](compose.md#database-users) describes.
 
 Version 1 brings these changes:
 
 - The `realmd` and `mangosd` containers now start as root and switch to the UID
   and GID from `CMANGOS_UID` and `CMANGOS_GID`. Setting `user` instead stops
   the containers with an error.
-- The image now sets the database connection of `realmd` and `mangosd`, and
-  ignores the `LoginDatabaseInfo`, `WorldDatabaseInfo`,
+- The image now sets the database connection of the `realmd` and `mangosd`
+  services, and ignores the `LoginDatabaseInfo`, `WorldDatabaseInfo`,
   `CharacterDatabaseInfo`, and `LogsDatabaseInfo` options of the configuration
   files. The servers take the user and password from `CMANGOS_DATABASE_USER`
   and `CMANGOS_DATABASE_PASSWORD`.
@@ -48,12 +49,12 @@ Version 1 brings these changes:
   `SOAP.IP`, and `SOAP.Port`, and ignores them in the configuration files and
   in the environment. `mangosd.conf.example`, `realmd.conf.example`, and
   `anticheat.conf.example` list them in their headers. The container ports of
-  `realmd` and `mangosd` are now always the defaults, and no longer
-  configurable.
+  the `realmd` and `mangosd` services are now always the defaults, and no
+  longer configurable.
 - The example `database` service now has `stop_grace_period: 2m`, so a stop
   during startup lets the running step finish.
-- The example `database-backup` service now also backs up the migration edit
-  ledger in `maintenance`.
+- The example `database-backup` service now also backs up the record of
+  confirmed migration edits in the `maintenance` database.
 - Every image now checks `CMANGOS_DEPLOY_VERSION` on startup and stops when it
   is missing or different.
 - The example Compose files have tool services for the version check and the

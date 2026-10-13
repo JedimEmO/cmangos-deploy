@@ -1,14 +1,14 @@
-# cmangos-deploy: this file differs from upstream's `mangosd.conf.dist.in` in
-# the options below, which it leaves out, because the image sets them and
+# cmangos-deploy: this file differs from the `mangosd.conf.dist.in` of CMaNGOS
+# in the options below, which it leaves out, because the image sets them and
 # ignores them in this file. Adding one back has no effect, and neither has an
 # environment variable for one.
 #
-# - `DataDir` and `LogsDir`: the directories under `/opt/cmangos/storage/`
-#   that the Compose file mounts.
+# - `DataDir` and `LogsDir`: the directories under `/opt/cmangos/storage/` that
+#   your `compose.yaml` mounts.
 # - `LoginDatabaseInfo`, `WorldDatabaseInfo`, `CharacterDatabaseInfo`, and
 #   `LogsDatabaseInfo`: the server connects to the `database` service, with the
 #   user and password from `CMANGOS_DATABASE_USER` and
-#   `CMANGOS_DATABASE_PASSWORD` in the Compose file.
+#   `CMANGOS_DATABASE_PASSWORD` in your `compose.yaml`.
 # - `WorldServerPort`, `BindIP`, `Ra.IP`, `Ra.Port`, `SOAP.IP`, and
 #   `SOAP.Port`: to use another port, change its host side in your
 #   `compose.yaml`.

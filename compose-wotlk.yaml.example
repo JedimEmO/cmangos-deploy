@@ -17,9 +17,9 @@ services:
     environment:
       - CMANGOS_DEPLOY_VERSION=1 # See `docs/breaking-changes.md`.
       - TZ=Etc/UTC # The time zone, usually your host's.
-      - MARIADB_USER=mangos # Takes effect on the first start only.
-      - MARIADB_PASSWORD=mangos # Takes effect on the first start only.
-      - MARIADB_ROOT_PASSWORD=password # Takes effect on the first start only.
+      - MARIADB_USER=mangos # To change this after the first start, change it in MariaDB first, then here.
+      - MARIADB_PASSWORD=mangos # To change this after the first start, change it in MariaDB first, then here.
+      - MARIADB_ROOT_PASSWORD=password # To change this after the first start, change it in MariaDB first, then here.
       - CMANGOS_REALMLIST_NAME=CMaNGOS WotLK
       - CMANGOS_REALMLIST_ADDRESS=127.0.0.1 # The LAN or WAN address or the domain name that clients connect to.
       - CMANGOS_REALMLIST_PORT=8085 # The host port of the `mangosd` service.
@@ -27,7 +27,7 @@ services:
       - CMANGOS_REALMLIST_TIMEZONE=0 # 2 = United States, 3 = Oceanic, 4 = Latin America, 8 = English, 9 = German, 10 = French, 11 = Spanish, 12 = Russian.
       - CMANGOS_REALMLIST_ALLOWED_SECURITY_LEVEL=0 # 0 admits regular players.
       - CMANGOS_ENABLE_AUTOMATIC_WORLD_DB_CORRECTIONS=1 # Re-creates the world database to apply a migration edit.
-      - CMANGOS_HALT_ON_MIGRATION_EDITS=1 # Halts the start until you apply a migration edit to a database with player data.
+      - CMANGOS_HALT_ON_MIGRATION_EDITS=1 # Halts the start until you handle a migration edit to a database with player data.
       - CMANGOS_PROCESS_CUSTOM_SQL=1 # Runs your custom SQL files on every start.
 
   realmd:
@@ -51,14 +51,14 @@ services:
     environment:
       - CMANGOS_DEPLOY_VERSION=1 # See `docs/breaking-changes.md`.
       - TZ=Etc/UTC # The time zone, usually your host's.
-      - CMANGOS_UID=1000 # On Linux, the owner of the writable bind mounts. Do not change it once the server has run.
-      - CMANGOS_GID=1000 # On Linux, the group of the writable bind mounts. Do not change it once the server has run.
+      - CMANGOS_UID=1000 # On Linux, the owner of the writable bind mounts. To change this after the first start, change their owner on the host as well.
+      - CMANGOS_GID=1000 # On Linux, the group of the writable bind mounts. To change this after the first start, change their group on the host as well.
       - CMANGOS_DATABASE_USER=mangos # Must match `MARIADB_USER` of the `database` service.
       - CMANGOS_DATABASE_PASSWORD=mangos # Must match `MARIADB_PASSWORD` of the `database` service.
 
   mangosd:
-    # The `&mangosd-image` anchor is used by `check-deploy-version` and
-    # `extract-client-data` and has to stay.
+    # The `&mangosd-image` anchor is used by the `check-deploy-version` and
+    # `extract-client-data` services and has to stay.
     image: &mangosd-image ghcr.io/mserajnik/cmangos-server-wotlk
     command: mangosd
     tty: true
@@ -77,7 +77,7 @@ services:
     ports:
       - 8085:8085 # The host port, left of the colon, has to match `CMANGOS_REALMLIST_PORT`.
       # - 7878:7878 # For SOAP, uncomment this line and set `SOAP.Enabled = 1` in `config/wotlk/mangosd.conf`.
-      # - 3443:3443 # For RA, uncomment this line and set `Ra.Enable = 1` in `config/wotlk/mangosd.conf`.
+      # - 3443:3443 # For the remote console, uncomment this line and set `Ra.Enable = 1` in `config/wotlk/mangosd.conf`.
     volumes:
       - ./config/wotlk/mangosd.conf:/opt/cmangos/config/mangosd.conf:ro
       - ./config/wotlk/anticheat.conf:/opt/cmangos/config/anticheat.conf:ro
@@ -85,13 +85,13 @@ services:
       - ./config/wotlk/aiplayerbot.conf:/opt/cmangos/config/aiplayerbot.conf:ro
       - ./storage/wotlk/mangosd/extracted-data:/opt/cmangos/storage/data:ro
       - ./storage/wotlk/mangosd/logs:/opt/cmangos/storage/logs
-    # The `&mangosd-environment` anchor is used by `check-deploy-version` and
-    # `extract-client-data` and has to stay.
+    # The `&mangosd-environment` anchor is used by the `check-deploy-version`
+    # and `extract-client-data` services and has to stay.
     environment: &mangosd-environment
       - CMANGOS_DEPLOY_VERSION=1 # See `docs/breaking-changes.md`.
       - TZ=Etc/UTC # The time zone, usually your host's.
-      - CMANGOS_UID=1000 # On Linux, the owner of the writable bind mounts. Do not change it once the server has run.
-      - CMANGOS_GID=1000 # On Linux, the group of the writable bind mounts. Do not change it once the server has run.
+      - CMANGOS_UID=1000 # On Linux, the owner of the writable bind mounts. To change this after the first start, change their owner on the host as well.
+      - CMANGOS_GID=1000 # On Linux, the group of the writable bind mounts. To change this after the first start, change their group on the host as well.
       - CMANGOS_DATABASE_USER=mangos # Must match `MARIADB_USER` of the `database` service.
       - CMANGOS_DATABASE_PASSWORD=mangos # Must match `MARIADB_PASSWORD` of the `database` service.
 

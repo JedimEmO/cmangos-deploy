@@ -32,18 +32,18 @@ while [ "$#" -gt 0 ]; do
 done
 
 if [ ! -d "$client_data_dir" ] || [ ! -d "$client_data_dir/Data" ]; then
-  echo "[cmangos-deploy]: ERROR: '$client_data_dir' has no 'Data' directory. Copy the contents of your client directory there." >&2
+  echo "[cmangos-deploy]: ERROR: The client data directory '$client_data_dir' has no 'Data' directory. Copy the contents of your client directory into the directory that your 'compose.yaml' mounts there, as the example Compose file shows." >&2
   exit 1
 fi
 
 if [ ! -d "$extracted_data_dir" ]; then
-  echo "[cmangos-deploy]: ERROR: The extracted data directory '$extracted_data_dir' does not exist. Mount your extracted data directory there in your 'compose.yaml', as the 'compose-*.yaml.example' files show." >&2
+  echo "[cmangos-deploy]: ERROR: The extracted data directory '$extracted_data_dir' does not exist. Mount your extracted data directory there in your 'compose.yaml', as the example Compose file shows." >&2
   exit 1
 fi
 
 if [ "$force" = false ]; then
   if [ -d "$extracted_data_dir/dbc" ] || [ -d "$extracted_data_dir/maps" ] || [ -d "$extracted_data_dir/mmaps" ] || [ -d "$extracted_data_dir/vmaps" ]; then
-    echo "[cmangos-deploy]: Previously extracted data has been found in '$extracted_data_dir'. Continue with the extraction, which will overwrite the old data? [Y/n]"
+    echo "[cmangos-deploy]: The extracted data directory '$extracted_data_dir' already contains extracted data. Continue with the extraction, which overwrites the old data? [Y/n]"
 
     if ! read -r choice; then
       choice="y"
@@ -64,7 +64,7 @@ rm -f ./MaNGOSExtractor.log ./MaNGOSExtractor_detailed.log
 
 cd "$tools_dir"
 if ! ./ExtractResources.sh a "$client_data_dir" "$client_data_dir"; then
-  echo "[cmangos-deploy]: ERROR: The extraction failed. See the errors above and 'MaNGOSExtractor_detailed.log' in the client data directory." >&2
+  echo "[cmangos-deploy]: ERROR: The extraction failed. See the errors above and the log file 'MaNGOSExtractor_detailed.log' in the client data directory." >&2
   exit 1
 fi
 
