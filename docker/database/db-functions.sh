@@ -837,7 +837,7 @@ print_correction_halt_message() {
 [cmangos-deploy]: ERROR: Migration edits affect your databases.
 cmangos-deploy will not apply these changes for you. Startup is halted.
 
-Affected databases, one entry per edit:
+The edits, each with the name of the database it affects:
 EOF
 
   local i=0
@@ -852,30 +852,37 @@ EOF
     commit_hash="${PENDING_DB_COMMIT_HASHES[$i]}"
     repository="$(correction_source_repository "$source_name")"
     database_name="$(correction_database_name "$name")"
-    printf '  - %s (%s)\n' "$name" "$database_name" >&2
+    printf '  - %s\n' "$database_name" >&2
     printf '    https://github.com/%s/commit/%s\n' "$repository" "$commit_hash" >&2
     i=$((i + 1))
   done
 
   cat >&2 <<'EOF'
 
-For each entry above:
+For each edit above:
 
   1. Open its GitHub link to see what changed.
-  2. Apply the equivalent SQL to the running database yourself, using the name
-     in parentheses above:
+  2. Make the edit's changes yourself in the affected database. The database
+     does not apply an edited migration again, so it still matches the result
+     of the old version. Run the SQL that changes it to the result of the new
+     version. To open the database, run on the host:
+
        docker compose exec database mariadb -u root -p <database>
-     (mariadb prompts for the password, which matches your
-     'MARIADB_ROOT_PASSWORD' setting in your 'compose.yaml'.)
+
+     (The MariaDB client prompts for the password, which matches your
+     'MARIADB_ROOT_PASSWORD' setting in your 'compose.yaml'. To leave the
+     client, run 'exit'.)
+
      You can ignore an edit to a migration that has not been applied to the
      database yet. The documentation shows how to check:
      https://github.com/mserajnik/cmangos-deploy/blob/master/docs/usage.md#applying-changes-by-hand
 
-When you have applied the changes to all of them, confirm by running on the
-host:
+When you have handled every edit above, confirm by running on the host:
+
   docker compose exec database cmangos-confirm-changes
 
 To cancel the start and handle the edits later instead, run on the host:
+
   docker compose down
 
 While the container is paused, MariaDB is reachable inside the container via
@@ -887,7 +894,7 @@ continues. It does not check your database to verify that the changes you made
 match what the commits describe. If your manual fix is incorrect or incomplete,
 the database will be in an inconsistent state and CMaNGOS may fail to start.
 The responsibility for matching what the commits do is yours, and
-cmangos-deploy provides no further support for resolving these issues.
+cmangos-deploy provides no further support for individual cases.
 EOF
 }
 

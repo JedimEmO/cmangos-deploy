@@ -233,9 +233,9 @@ your configuration.
 
 ## Migration edits
 
-Sometimes, upstream edits a migration that your databases have already applied.
-The database cannot apply such a change again, so cmangos-deploy detects these
-edits and acts on them.
+Sometimes, the developers of CMaNGOS or the Playerbot module edit a migration
+that your databases have already applied. The database cannot apply such a
+change again, so cmangos-deploy detects these edits and acts on them.
 
 - For the world database, the `database` service re-creates it from the new
   image. Changes you made directly in the world database are lost, such as your
@@ -251,9 +251,9 @@ describes the two variables that control this.
 ### Applying changes by hand
 
 When the start halts, the `database` service prints the affected databases and
-the link to each upstream commit. `realmd` and `mangosd` wait for the database,
-so `docker compose up -d` keeps waiting too. Read the message from a second
-terminal:
+the link to the commit of each edit. `realmd` and `mangosd` wait for the
+database, so `docker compose up -d` keeps waiting too. Read the message from a
+second terminal:
 
 ```sh
 docker compose logs database
@@ -262,15 +262,23 @@ docker compose logs database
 The container waits as long as you need. To resolve the halt:
 
 1. Open each linked commit and read its changes to the SQL files.
-2. Apply the same changes to each affected database, with the name in
-   parentheses in the message. To open a database, run:
+2. Make each edit's changes yourself in the affected database, whose name the
+   message lists with the edit. The database does not apply an edited migration
+   again, so it still matches the result of the old version. Compare the old
+   and the new version of each edited file in the commit, and run the SQL that
+   changes the database to the result of the new version. For example, if the
+   edit adds a column, add that column yourself.
+
+   To open a database, run:
 
    ```sh
    docker compose exec database mariadb -u root -p <database>
    ```
 
-   The password is `MARIADB_ROOT_PASSWORD` from your `compose.yaml`.
-3. Once you have applied every change, confirm:
+   The password is `MARIADB_ROOT_PASSWORD` from your `compose.yaml`. The
+   [MariaDB client documentation][mariadb-client] describes the client's
+   commands. To leave the client, run `exit`.
+3. Once you have handled every listed edit, confirm:
 
    ```sh
    docker compose exec database cmangos-confirm-changes
@@ -278,6 +286,13 @@ The container waits as long as you need. To resolve the halt:
 
 The `database` service then records the commits as applied, and the start
 continues.
+
+> [!WARNING]
+> The confirmation marks the listed commits as applied without checking your
+> database. If your change is wrong or incomplete, the database stays
+> inconsistent, and CMaNGOS may fail to start. Matching what the commits do is
+> your responsibility, and cmangos-deploy provides no further support for
+> individual cases.
 
 If you would rather cancel the start and handle the edits later, run
 `docker compose down` instead of confirming. The `database` service halts again
@@ -297,8 +312,11 @@ from:
     -e "SELECT * FROM <version-table>"
   ```
 
-  An update whose number, such as `z2819_01`, is higher than the number in that
-  column name has not been applied.
+  The column name contains the number of the last applied update, such as
+  `z2818_02` in `required_z2818_02_characters_...`. An update with a higher
+  number has not been applied: compare the part before the underscore first,
+  such as `2819` against `2818`, and the part after it only when those are
+  equal.
 - A file of the Playerbot module in `sql/characters/`: the database records
   each applied file by its name, with `.sql`:
 
@@ -309,21 +327,16 @@ from:
   ```
 
   When the query returns no row, the file has not been applied.
-- A change to a base dump, `sql/base/<database>.sql`: the database read this
-  file only when it was created. If the same commit adds an update that has not
-  been applied yet, that update makes the same change, so you can ignore the
-  edit. Otherwise, apply it by hand.
+- A change to a base dump, `sql/base/<database>.sql`: the `database` service
+  imported this file only when it created the database. If the same commit adds
+  an update that has not been applied yet, that update usually makes the same
+  change. Compare the two, and if the update covers every change to the base
+  dump, you can ignore the edit. Otherwise, apply the rest by hand.
 
 For a renamed migration, check its old file name.
 
 Even when every listed edit can be ignored, you still have to confirm, as step
 3 above describes.
-
-> [!WARNING]
-> The confirmation marks the listed commits as applied without checking your
-> database. If your change is wrong or incomplete, the database stays
-> inconsistent, and CMaNGOS may fail to start. Matching what the commits do is
-> your responsibility.
 
 ## Custom SQL
 
@@ -406,4 +419,5 @@ responsible for securing it. cmangos-deploy does not support such a setup.
 > CMaNGOS data, from any address.
 
 [image-cmangos-packages]: https://github.com/mserajnik?tab=packages&repo_name=cmangos-deploy
+[mariadb-client]: https://mariadb.com/docs/server/clients-and-utilities/mariadb-client/mariadb-command-line-client
 [playerbots]: https://github.com/cmangos/playerbots
