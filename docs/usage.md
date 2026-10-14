@@ -77,6 +77,13 @@ skip the question, add `--force` at the end of the command.
 CMaNGOS's anticheat, including Warden, is enabled by default. The options in
 your `config/classic/anticheat.conf` adjust or disable it.
 
+> [!WARNING]
+> Clients other than the ones CMaNGOS targets, such as modern official clients
+> that connect through a proxy and third-party re-implementations, are unlikely
+> to work while Warden is enabled: the server disconnects a client that fails
+> to answer its checks. To use such a client, set `Warden.Enable = 0` in your
+> `config/classic/anticheat.conf`.
+
 ## Running CMaNGOS
 
 To start CMaNGOS, run:
