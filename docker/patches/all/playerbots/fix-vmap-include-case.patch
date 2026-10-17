@@ -1,0 +1,22 @@
+diff --git a/playerbot/RandomPlayerbotMgr.cpp b/playerbot/RandomPlayerbotMgr.cpp
+index 2ae8f71..a1dd46f 100644
+--- a/playerbot/RandomPlayerbotMgr.cpp
++++ b/playerbot/RandomPlayerbotMgr.cpp
+@@ -16,8 +16,17 @@
+ #include "Grids/GridNotifiers.h"
+ #include "Maps/GridDefines.h"
+ #include "MotionGenerators/MoveMap.h"
++// cmangos-deploy: cmangos/playerbots includes `VMapFactory.h` and
++// `VMapManager2.h` from `Vmap/` for every expansion, but only
++// cmangos/mangos-wotlk names the directory that way, which breaks the Classic
++// and TBC builds on case-sensitive file systems.
++#ifdef MANGOSBOT_TWO
+ #include "Vmap/VMapFactory.h"
+ #include "Vmap/VMapManager2.h"
++#else
++#include "vmap/VMapFactory.h"
++#include "vmap/VMapManager2.h"
++#endif
+ #include "Grids/GridNotifiersImpl.h"
+ #include "Grids/CellImpl.h"
+ #include "FleeManager.h"
