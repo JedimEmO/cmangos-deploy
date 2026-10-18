@@ -50,7 +50,6 @@ apply_versioned_updates "characters" "/sql/core/updates/characters" "characters"
 apply_versioned_updates "realmd" "/sql/core/updates/realmd" "realmd"
 apply_versioned_updates "logs" "/sql/core/updates/logs" "logs"
 apply_world_static_sql "mangos"
-fix_tbc_locales_gameobject "mangos"
 apply_character_static_sql "characters"
 
 configure_realm

@@ -504,73 +504,6 @@ apply_world_content_updates() {
   apply_tracked_sql_dir "$world_db" "/sql/database/Updates/Instances" "database-instance-updates"
 }
 
-# Works around a bug in `cmangos/tbc-db`: `locales/OtherLocales.sql` re-creates
-# `locales_gameobject` with the columns from before `s2485`, which `mangosd` no
-# longer reads, so apply `s2485` again while `castbarcaption_loc1` exists. A
-# partial upstream fix makes the `ALTER` statements fail, which stops the
-# start.
-# TODO: Remove this and its calls once the drift check on that file in
-# `.github/deploy.yaml` reports the fix.
-fix_tbc_locales_gameobject() {
-  local world_db="$1"
-  local has_old_column
-  local status
-
-  if [[ "$CMANGOS_EXPANSION" != "tbc" ]]; then
-    return 0
-  fi
-
-  set +e
-  has_old_column="$(mariadb -u root -p"$MARIADB_ROOT_PASSWORD" information_schema -N -s -e \
-    "SELECT 1 \
-     FROM COLUMNS \
-     WHERE TABLE_SCHEMA = '$(sql_escape "$world_db")' \
-       AND TABLE_NAME = 'locales_gameobject' \
-       AND COLUMN_NAME = 'castbarcaption_loc1' \
-     LIMIT 1;")"
-  status=$?
-  set -e
-
-  if [[ $status -ne 0 ]]; then
-    cmangos_fail "Failed to read the columns of the 'locales_gameobject' table of the world database. See the error above."
-  fi
-
-  if [[ -z "$has_old_column" ]]; then
-    return 0
-  fi
-
-  cmangos_log "Re-applying the 's2485' changes to the 'locales_gameobject' table of the world database (workaround for a bug in 'cmangos/tbc-db')..."
-  if ! mariadb -u root -p"$MARIADB_ROOT_PASSWORD" "$world_db" <<'SQL'
-ALTER TABLE `locales_gameobject` CHANGE `name_loc1` `name_loc1` varchar(100);
-ALTER TABLE `locales_gameobject` CHANGE `name_loc2` `name_loc2` varchar(100);
-ALTER TABLE `locales_gameobject` CHANGE `name_loc3` `name_loc3` varchar(100);
-ALTER TABLE `locales_gameobject` CHANGE `name_loc4` `name_loc4` varchar(100);
-ALTER TABLE `locales_gameobject` CHANGE `name_loc5` `name_loc5` varchar(100);
-ALTER TABLE `locales_gameobject` CHANGE `name_loc6` `name_loc6` varchar(100);
-ALTER TABLE `locales_gameobject` CHANGE `name_loc7` `name_loc7` varchar(100);
-ALTER TABLE `locales_gameobject` CHANGE `name_loc8` `name_loc8` varchar(100);
-ALTER TABLE `locales_gameobject` CHANGE `castbarcaption_loc1` `opening_text_loc1` varchar(100);
-ALTER TABLE `locales_gameobject` CHANGE `castbarcaption_loc2` `opening_text_loc2` varchar(100);
-ALTER TABLE `locales_gameobject` CHANGE `castbarcaption_loc3` `opening_text_loc3` varchar(100);
-ALTER TABLE `locales_gameobject` CHANGE `castbarcaption_loc4` `opening_text_loc4` varchar(100);
-ALTER TABLE `locales_gameobject` CHANGE `castbarcaption_loc5` `opening_text_loc5` varchar(100);
-ALTER TABLE `locales_gameobject` CHANGE `castbarcaption_loc6` `opening_text_loc6` varchar(100);
-ALTER TABLE `locales_gameobject` CHANGE `castbarcaption_loc7` `opening_text_loc7` varchar(100);
-ALTER TABLE `locales_gameobject` CHANGE `castbarcaption_loc8` `opening_text_loc8` varchar(100);
-ALTER TABLE `locales_gameobject` ADD COLUMN `closing_text_loc1` varchar(100);
-ALTER TABLE `locales_gameobject` ADD COLUMN `closing_text_loc2` varchar(100);
-ALTER TABLE `locales_gameobject` ADD COLUMN `closing_text_loc3` varchar(100);
-ALTER TABLE `locales_gameobject` ADD COLUMN `closing_text_loc4` varchar(100);
-ALTER TABLE `locales_gameobject` ADD COLUMN `closing_text_loc5` varchar(100);
-ALTER TABLE `locales_gameobject` ADD COLUMN `closing_text_loc6` varchar(100);
-ALTER TABLE `locales_gameobject` ADD COLUMN `closing_text_loc7` varchar(100);
-ALTER TABLE `locales_gameobject` ADD COLUMN `closing_text_loc8` varchar(100);
-SQL
-  then
-    cmangos_fail "Failed to re-apply the 's2485' changes to the 'locales_gameobject' table of the world database. See the error above."
-  fi
-}
-
 apply_world_static_sql() {
   local world_db="$1"
 
@@ -772,7 +705,6 @@ https://github.com/mserajnik/cmangos-deploy/issues"
   apply_world_content_updates "mangos"
   apply_versioned_updates "mangos" "/sql/core/updates/mangos" "mangos"
   apply_world_static_sql "mangos"
-  fix_tbc_locales_gameobject "mangos"
 }
 
 PENDING_DB_NAMES=()

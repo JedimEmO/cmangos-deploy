@@ -72,11 +72,6 @@ drift:
     # steps of `InstallFullDB.sh`. A change to them may need the same change
     # there.
     - {source: db, files: [InstallFullDB.sh]}
-    # `fix_tbc_locales_gameobject` in `docker/database/db-functions.sh` repairs
-    # the table that this file re-creates with its pre-`s2485` columns. A
-    # change here likely means upstream fixed it, and the workaround can be
-    # removed.
-    - {source: db, variants: [tbc], files: [locales/OtherLocales.sql]}
     # The Playerbot module has one configuration template per expansion.
     - {source: playerbots, files: [playerbot/aiplayerbot.conf.dist.in, playerbot/aiplayerbot.conf.dist.in.tbc, playerbot/aiplayerbot.conf.dist.in.wotlk]}
     # `docker/database/docker-entrypoint.sh` builds on this entrypoint.
