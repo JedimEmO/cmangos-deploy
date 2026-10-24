@@ -1,0 +1,13 @@
+diff --git a/src/game/Entities/Player.cpp b/src/game/Entities/Player.cpp
+index 4d8e9160a..c401b9ade 100644
+--- a/src/game/Entities/Player.cpp
++++ b/src/game/Entities/Player.cpp
+@@ -3719,6 +3719,8 @@ void Player::_SaveSpellCooldowns()
+ 
+ uint32 Player::resetTalentsCost() const
+ {
++    // wow-playground: a respec never costs more than one gold.
++    return 1 * GOLD;
+     // The first time reset costs 1 gold
+     if (m_resetTalentsCost < 1 * GOLD)
+         return 1 * GOLD;
